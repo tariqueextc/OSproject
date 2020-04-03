@@ -1,0 +1,152 @@
+#include<iostream>
+using namespace std;
+/*
+	no - Number of Processes
+	rmp - Remaining Processes
+	Pn - Process Number to be displayed in the output
+	at - Arrival time as entered by the user
+	bt - Burst time as entered by the user
+	rt - Remaining time
+	tquan - Time Quantum
+	ct - Current Time
+	wt_t - Waiting Time
+	tat_t - Turn Around Time
+	avg_wt - Average Waiting Time
+	avg_tat - Average Waiting Time
+	btime - Burst time
+*/
+
+void func(int no,int rt[10],int ct,int at[10], int bt[10]){
+	
+	float avg_wt,avg_tat;
+    int i=0,j,n=no,temp,btime[20],Pn[20],wt_t[20],tat_t[20],total=0,loc;
+    
+    cout<<" After the second iteration the processor is given to Processes which needs more time quantum.\n";
+    
+    while(i<n)
+    {
+        btime[i]=rt[i];
+        wt_t[i]=ct-at[i]-btime[i];
+		Pn[i]=i+1;
+		i++;
+    }
+	
+    for(i=0;i<n;i++)
+    {
+        loc=i;
+        for(j=i+1;j<n;j++)
+        {
+            if(btime[j]<btime[loc]){
+            	loc=j;
+            }
+        }
+        temp=btime[i];
+        btime[i]=btime[loc];
+        btime[loc]=temp;
+        temp=Pn[i];
+        Pn[i]=Pn[loc];
+        Pn[loc]=temp;
+    }
+	
+    for(i=1;i<n;i++)
+    {
+        for(j=0;j<i;j++){
+        	wt_t[i]+=btime[j];
+        }
+        total+=wt_t[i];
+    }
+ 
+    avg_wt=(float)total/n;
+    total=0;
+    cout<<"\n Process\t\t Burst time\t\t Waiting time\t\tTurnaround Time";
+    i=0;
+	while(i<n)
+    {
+        tat_t[i]=btime[i]+wt_t[i];
+        total=total + tat_t[i];
+        cout<<"\n";
+        cout<<" P"<<Pn[i]<<"\t\t\t     "<<btime[i]<<"\t\t\t    "<<wt_t[i]<<"\t\t\t     "<<tat_t[i];
+		i++;
+	}
+    avg_tat=(float)total/n;
+    cout<<"\n\n\t Average waiting time = "<<avg_wt;
+    cout<<"\n\n\t Average turnaround time = "<<avg_tat;
+	
+}
+
+void func(int no,int rt[10],int ct,int arT[10], int bsT[10]);
+
+int main() 
+{
+	int rmp,tquan,no,Pn=0,wt=0,ct=0,id=0,tat=0,x=1,at[10],bt[10],rt[10];
+	cout<<"Enter the number of processes "; 
+	cin>>no;
+	rmp = no;
+	
+	cout<<"\nEnter the arrival time and the burst time of processes\n";
+	while(Pn<no) 
+	{
+		cout<<"\nProcess P"<<Pn+1;
+		cout<<"\n";
+		cout<<"Arrival time = "; 
+		cin>>at[Pn];
+		cout<<"Burst time = "; 
+		cin>>bt[Pn]; 
+		rt[Pn]=bt[Pn];
+		Pn++; 
+	} 
+	cout<<"\n Details of the time quantum are as follows :- ";
+	cout<<"\n";
+	cout<<"\n The time quantum for the completion of Processes in first iteration is = 6.\n"; 
+	tquan=6;
+
+	for(Pn=0;rmp!=0;) 
+	{
+		if(rt[Pn]<=tquan && rt[Pn]>0)
+		{ 
+			ct+=rt[Pn]; 
+			rt[Pn]=0; 
+			id=1; 
+		} 
+		else if(rt[Pn]>0)
+		{ 
+			rt[Pn]-=tquan; 
+			ct+=tquan; 
+		} 
+		if(rt[Pn]==0 && id==1)			
+		{	
+			cout<<Pn;
+			rmp--;				
+			cout<<"P"<<Pn+1; 
+			cout<<"\t\t\t"<<ct-at[Pn];
+			cout<<"\n";
+			cout<<"\t\t\t"<<ct-bt[Pn]-at[Pn];
+			wt= wt+ct-at[Pn]-bt[Pn]; 
+			tat=tat+ct-at[Pn]; 
+			id=0; 
+                       
+		} 
+		if(Pn==no-1){
+			x++;
+			if(x==2){
+				Pn=0;
+				tquan=10;
+				
+				cout<<" The time quantum for the completion of Processes in second iteration is = 10. \n";
+			}
+			else{
+				break;
+			}
+		}
+		else if(ct >= at[Pn+1]){
+			Pn++;
+		}
+		else{
+			Pn=0;
+		}
+	}
+	
+	func(no,rt,ct,at,bt);
+	
+	return 0;
+}
